@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Ranked Wars</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .container {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #585858a8;
+            text-align: left;
+        }
+
+        .win {
+            color: green;
+            font-weight: bold;
+        }
+
+        .loss {
+            color: red;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 800px;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #000000;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%; /* Increase modal width */
+            max-height: 90%;
+            overflow-y: auto;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .modal-content table {
+            width: 100%; /* Ensure table fits modal width */
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .modal-content th,
+        .modal-content td {
+            border: 1px solid #000000;
+            padding: 8px;
+            text-align: left;
+            white-space: normal; /* Allow content wrapping */
+            word-wrap: break-word;
+        }
+
+        .modal-content th {
+            background-color: #f2f2f2;
+        }
+
+        .modal-content h2,
+        .modal-content h3,
+        .modal-content h4 {
+            margin-top: 20px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Past Ranked Wars</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>War ID</th>
+                    <th>Opponent</th>
+                    <th>Our Score</th>
+                    <th>Their Score</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Result</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for war_id, war_data in wars.items() %}
+                <tr>
+                    <td>{{ war_id }}</td>
+                    <td>
+                        {% for faction_id, faction_data in war_data.factions.items() %}
+                            {% if faction_id != '41067' %}
+                                {{ faction_data.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ war_data.factions['41067'].score }}</td>
+                    <td>
+                        {% for faction_id, faction_data in war_data.factions.items() %}
+                            {% if faction_id != '41067' %}
+                                {{ faction_data.score }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ war_data.war.start|datetime }}</td>
+                    <td>{{ war_data.war.end|datetime }}</td>
+                    <td class="{% if war_data.war.winner == 41067 %}win{% else %}loss{% endif %}">
+                        {% if war_data.war.winner == 41067 %}
+                            Win
+                        {% else %}
+                            Loss
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button onclick="fetchWarReport('{{ war_id }}')">View Report</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modal-content">
+                <!-- Dynamic content will load here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+
+        function openModal() {
+            document.getElementById("modal").style.display = "block";
+        }
+
+        async function fetchWarReport(warId) {
+            const modalContent = document.getElementById("modal-content");
+
+            modalContent.innerHTML = `<h2>War Report for ID: ${warId}</h2><p>Loading...</p>`;
+
+            try {
+                const response = await fetch(`/war-report/${warId}`);
+                const data = await response.json();
+
+                if (!data.rankedwarreport) {
+                    throw new Error("Invalid response from the server");
+                }
+
+                const report = data.rankedwarreport;
+                const factions = report.factions;
+                const war = report.war;
+
+                const factionA = factions["41067"];
+                const factionBId = Object.keys(factions).find(id => id !== "41067");
+                const factionB = factions[factionBId];
+
+                modalContent.innerHTML = `
+                    <h2>War Report for ID: ${warId}</h2>
+                    <h3>War Details</h3>
+                    <table>
+                        <tr><td><strong>Start Time:</strong></td><td>${new Date(war.start * 1000).toLocaleString()}</td></tr>
+                        <tr><td><strong>End Time:</strong></td><td>${new Date(war.end * 1000).toLocaleString()}</td></tr>
+                        <tr><td><strong>Winner:</strong></td><td>${war.winner === "41067" ? factionA.name : factionB.name}</td></tr>
+                        <tr><td><strong>Forfeit:</strong></td><td>${war.forfeit === 1 ? "Yes" : "No"}</td></tr>
+                    </table>
+
+                    <h3>Factions</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Faction</th><th>Score</th><th>Attacks</th><th>Rank Before</th><th>Rank After</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>${factionA.name}</td><td>${factionA.score}</td><td>${factionA.attacks}</td><td>${factionA.rank_before}</td><td>${factionA.rank_after}</td></tr>
+                            <tr><td>${factionB.name}</td><td>${factionB.score}</td><td>${factionB.attacks}</td><td>${factionB.rank_before}</td><td>${factionB.rank_after}</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Rewards</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Faction</th><th>Respect</th><th>Points</th><th>Items</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${factionA.name}</td>
+                                <td>${factionA.rewards.respect}</td>
+                                <td>${factionA.rewards.points}</td>
+                                <td>${factionA.rewards.items ? Object.values(factionA.rewards.items).map(item => `${item.name} x${item.quantity}`).join(", ") : "None"}</td>
+                            </tr>
+                            <tr>
+                                <td>${factionB.name}</td>
+                                <td>${factionB.rewards.respect}</td>
+                                <td>${factionB.rewards.points}</td>
+                                <td>${factionB.rewards.items ? Object.values(factionB.rewards.items).map(item => `${item.name} x${item.quantity}`).join(", ") : "None"}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Top Contributors</h3>
+                    <h4>${factionA.name}</h4>
+                    <table>
+                        <thead>
+                            <tr><th>Name</th><th>Level</th><th>Score</th><th>Attacks</th></tr>
+                        </thead>
+                        <tbody>
+                            ${Object.values(factionA.members)
+                                .sort((a, b) => b.score - a.score)
+                                .map(member => `
+                                    <tr>
+                                        <td>${member.name}</td>
+                                        <td>${member.level}</td>
+                                        <td>${member.score}</td>
+                                        <td>${member.attacks}</td>
+                                    </tr>
+                                `).join("")}
+                        </tbody>
+                    </table>
+
+                    <h4>${factionB.name}</h4>
+                    <table>
+                        <thead>
+                            <tr><th>Name</th><th>Level</th><th>Score</th><th>Attacks</th></tr>
+                        </thead>
+                        <tbody>
+                            ${Object.values(factionB.members)
+                                .sort((a, b) => b.score - a.score)
+                                .map(member => `
+                                    <tr>
+                                        <td>${member.name}</td>
+                                        <td>${member.level}</td>
+                                        <td>${member.score}</td>
+                                        <td>${member.attacks}</td>
+                                    </tr>
+                                `).join("")}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                modalContent.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+
+            openModal();
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("modal");
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>

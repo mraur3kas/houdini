@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Member Details</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Member Details</h1>
+        {% if error %}
+            <p style="color: rgb(0, 217, 255);">{{ error }}</p>
+        {% else %}
+            <p><strong>Name:</strong> {{ member.name }}</p>
+            <p><strong>War Hits:</strong> {{ member.personalstats.get("warhits", "N/A") }}</p>
+            <p><strong>Xanax Taken:</strong> {{ member.personalstats.get("xantaken", "N/A") }}</p>
+            <p><strong>Energy Drinks Consumed:</strong> {{ member.personalstats.get("energydrinkused", "N/A") }}</p>
+            <p><strong>Boosters Used:</strong> {{ member.personalstats.get("boostersused", "N/A") }}</p>
+            <p><strong>Stat Enhancers Used:</strong> {{ member.personalstats.get("statenhancersused", "N/A") }}</p>
+        {% endif %}
+        <a href="/faction">Back to Faction</a>
+    </div>
+    <div class="stars-wrapper">
+        <div class="star" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+        <div class="star" style="top: 30%; left: 50%; animation-delay: 1s;"></div>
+        <div class="star" style="top: 50%; left: 80%; animation-delay: 2s;"></div>
+        <div class="star" style="top: 70%; left: 10%; animation-delay: 3s;"></div>
+    </div>
+</body>
+</html>
+

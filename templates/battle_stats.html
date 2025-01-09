@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Stats</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: hsl(289, 96%, 11%);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px 30px;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        td {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        a, .button {
+            text-decoration: none;
+            color: #ffdd57;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+        }
+
+        a:hover, .button:hover {
+            color: #ffbb33;
+        }
+
+        .stars-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #fff;
+            animation: shoot 3s linear infinite;
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(100vw, 100vh);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translate(200vw, 200vh);
+                opacity: 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Battle Stats</h1>
+        {% if error %}
+            <p style="color: #ff6b6b; font-weight: bold;">{{ error }}</p>
+        {% else %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stat</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Strength</td>
+                        <td>{{ "{:,}".format(stats.get("strength", "N/A")) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Speed</td>
+                        <td>{{ "{:,}".format(stats.get("speed", "N/A")) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Defense</td>
+                        <td>{{ "{:,}".format(stats.get("defense", "N/A")) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Dexterity</td>
+                        <td>{{ "{:,}".format(stats.get("dexterity", "N/A")) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Total</td>
+                        <td>{{ "{:,}".format(stats.get("total", "N/A")) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+        <a href="/dashboard">Back to Dashboard</a>
+        <a class="button" href="/faction-battle-stats" target="_blank">Faction Battle Stats</a>
+    </div>
+    <div class="stars-wrapper">
+        <div class="star" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+        <div class="star" style="top: 30%; left: 50%; animation-delay: 1s;"></div>
+        <div class="star" style="top: 50%; left: 80%; animation-delay: 2s;"></div>
+        <div class="star" style="top: 70%; left: 10%; animation-delay: 3s;"></div>
+    </div>
+</body>
+</html>

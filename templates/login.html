@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Torn API</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Huntreses beer tax heaven</h2>
+        {% if error %}
+            <p id="error">{{ error }}</p>
+        {% endif %}
+        <form method="post">
+            <input type="text" id="api_key" name="api_key" placeholder="Enter your Torn API Key" value="{{ saved_api_key or '' }}" required>
+            <div style="text-align: left;">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">Remember API Key</label>
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+</body>
+<div class="stars-wrapper">
+    <div class="star" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="star" style="top: 30%; left: 50%; animation-delay: 1s;"></div>
+    <div class="star" style="top: 50%; left: 80%; animation-delay: 2s;"></div>
+    <div class="star" style="top: 70%; left: 10%; animation-delay: 3s;"></div>
+  </div>
+</html>

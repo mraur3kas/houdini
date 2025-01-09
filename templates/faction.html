@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Faction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        // Function to fetch and display the status of all members
+        async function fetchStatuses() {
+            const memberIds = {{ faction.members.keys()|list|tojson }}; // Convert dict_keys to a list and serialize it to JSON
+            const refreshAllButton = document.getElementById("refresh-all");
+            refreshAllButton.disabled = true;
+
+            for (const memberId of memberIds) {
+                const statusCell = document.getElementById(`status-${memberId}`);
+                if (statusCell) {
+                    statusCell.innerHTML = "Fetching...";
+                }
+            }
+
+            try {
+                for (const memberId of memberIds) {
+                    await fetchMemberStatus(memberId);
+                }
+            } finally {
+                refreshAllButton.disabled = false;
+            }
+        }
+
+        // Function to fetch and display the status of a specific member
+        async function fetchMemberStatus(memberId) {
+            const statusCell = document.getElementById(`status-${memberId}`);
+
+            if (!statusCell) return;
+
+            try {
+                const response = await fetch(`/member/${memberId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const status = data.status;
+
+                    // Format the status display
+                    if (status.state === "Okay") {
+                        statusCell.innerHTML = `<span style="color: green; font-weight: bold;">${status.state}</span>`;
+                    } else if (status.state === "Traveling") {
+                        const country = status.description || "Unknown Country";
+                        statusCell.innerHTML = `<span style="color: blue; font-weight: bold;">Traveling (${country})</span>`;
+                    } else if (status.state === "Hospital") {
+                        statusCell.innerHTML = `<span style="color: red; font-weight: bold;">${status.description}</span>`;
+                    } else if (status.state === "Abroad") {
+                        const country = status.description || "Unknown Country";
+                        statusCell.innerHTML = `<span style="color: blue; font-weight: bold;">Abroad (${country})</span>`;
+                    } else {
+                        statusCell.innerHTML = `<span>${status.state}</span>`;
+                    }
+                } else {
+                    statusCell.innerHTML = `<span style="color: red;">Error fetching</span>`;
+                }
+            } catch (error) {
+                statusCell.innerHTML = `<span style="color: red;">Error</span>`;
+            }
+        }
+
+        // Fetch member details for modal
+        async function fetchMemberDetails(memberId, memberName) {
+            document.getElementById("modal-title").innerText = `Details for ${memberName}`;
+            document.getElementById("modal-content").innerHTML = "Loading details...";
+
+            try {
+                const response = await fetch(`/member/${memberId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const status = data.status.state;
+                    const description = data.status.description || "N/A";
+                    document.getElementById("modal-content").innerHTML = `
+                        <p><strong>Name:</strong> ${data.name}</p>
+                        <p><strong>Ranked War Hits:</strong> ${data.personalstats.rankedwarhits || "N/A"}</p>
+                        <p><strong>Xanax Taken:</strong> ${data.personalstats.xantaken || "N/A"}</p>
+                        <p><strong>Boosters Used:</strong> ${data.personalstats.boostersused || "N/A"}</p>
+                        <p><strong>Cans Used:</strong> ${data.personalstats.energydrinkused || "N/A"}</p>
+                        <p><strong>Refills Used:</strong> ${data.personalstats.refills || "N/A"}</p>
+                        <p><strong>Status:</strong> ${status} (${description})</p>
+                    `;
+                } else {
+                    document.getElementById("modal-content").innerHTML = "Failed to fetch member details.";
+                }
+            } catch (error) {
+                document.getElementById("modal-content").innerHTML = "An error occurred while fetching details.";
+            }
+
+            document.getElementById("modal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        window.onload = function () {
+            fetchStatuses();
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <a href="/dashboard" style="margin-bottom: 20px; background-color: #00b7ff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;">Back to Dashboard</a>
+        <h1>Faction Information</h1>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ccc;"><strong>Name:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ccc;">{{ faction.name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ccc;"><strong>ID:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ccc;">{{ faction.ID }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ccc;"><strong>Total Members:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ccc;">{{ faction.members | length }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ccc;"><strong>Respect:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ccc;">{{ "{:,}".format(faction.respect) }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ccc;"><strong>Rank:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ccc;">
+                    {{ faction.rank.name }} - Level: {{ faction.rank.level }}, Division: {{ faction.rank.division }},
+                    Wins: {{ faction.rank.wins }}
+                </td>
+            </tr>
+        </table>
+
+        <button id="refresh-all" onclick="fetchStatuses()" style="margin-bottom: 20px; background-color: #00b7ff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+            Refresh All
+        </button>
+
+        {% if error %}
+            <p style="color: rgb(0, 183, 255); text-align: center;">{{ error }}</p>
+        {% else %}
+            <h2>Members</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <tr>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #ccc;">Name</th>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #ccc;">Level</th>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #ccc;">Status</th>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #ccc;">Details</th>
+                </tr>
+                {% for member_id, member in faction.members.items() %}
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #ccc;">{{ member.name }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ccc;">{{ member.level }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ccc;" id="status-{{ member_id }}">Fetching...</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ccc;">
+                        <a href="javascript:void(0);" onclick="fetchMemberDetails('{{ member_id }}', '{{ member.name }}')" style="color: rgb(0, 183, 255); text-decoration: none;">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+        <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); margin:100px auto; padding:20px; width:400px; position:relative; border-radius:10px;">
+            <h2 id="modal-title" style="margin-bottom: 10px;">Details</h2>
+            <div id="modal-content">Loading...</div>
+            <button onclick="closeModal()" style="margin-top:20px; background-color: #00b7ff; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Close</button>
+        </div>
+    </div>
+</body>
+</html>

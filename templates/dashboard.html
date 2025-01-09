@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="stars-wrapper">
+        <div class="star" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+        <div class="star" style="top: 30%; left: 50%; animation-delay: 1s;"></div>
+        <div class="star" style="top: 50%; left: 80%; animation-delay: 2s;"></div>
+        <div class="star" style="top: 70%; left: 10%; animation-delay: 3s;"></div>
+      </div>
+        <h1>Welcome, {{ name }}!</h1>
+        <nav>
+            <ul>
+                <li><a href="/dashboard">Home</a></li>
+                <li><a href="/faction">Faction</a></li>
+                <li><a href="/past-wars">Past Wars</a></li>
+                <li><a href="/battle-stats">Battle Stats</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+        <p>You have successfully logged in.</p>
+    </div>
+</body>
+</html>

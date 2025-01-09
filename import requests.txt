@@ -1,0 +1,41 @@
+import requests
+
+# Replace with your Torn API key
+API_KEY = "your_api_key_here"
+BASE_URL = "https://api.torn.com"
+
+def get_torn_data(section="user", selection="basic"):
+   
+    Fetch data from the Torn API.
+
+    :param section: The section of the API to query (e.g., 'user', 'faction', 'market').
+    :param selection: The specific data to retrieve (e.g., 'basic', 'crimes', 'stocks').
+    :return: The JSON response from the API.
+    
+    endpoint = f"{BASE_URL}/{section}/"
+    params = {
+        "selections": selection,
+        "key": API_KEY
+    }
+
+    try:
+        response = requests.get(endpoint, params=params)
+        response.raise_for_status()  # Raise HTTPError for bad responses
+        data = response.json()
+        
+        if "error" in data:
+            print(f"Error: {data['error']['error']}")
+        else:
+            return data
+
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+
+# Example usage
+if __name__ == "__main__":
+    section = "user"  # Change to other sections like 'faction' or 'market' as needed
+    selection = "basic"  # Adjust selection based on the data you want
+    data = get_torn_data(section, selection)
+
+    if data:
+        print(data)
