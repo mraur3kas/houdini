@@ -1,42 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Past Ranked Wars</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        .container {
+        /* Navigation Styles */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            margin: 0 auto;
+            background-color: rgba(36, 36, 62, 0.9);
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #eaeaea;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            background-color: #00d4ff;
+            color: #0f0f1a;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .container {
+            margin-top: 70px; /* Ensure content is below the fixed navigation bar */
+        }
+
+        /* General Styles */
+        .container {
+            width: 100%;
+            background: linear-gradient(-45deg, #0f0f1a, #1a1a2e, #24243e, #2c2c4a);
+            background-size: 400% 400%;
+            animation: gradientBackground 15s ease infinite;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            text-align: left;
+            background-color: rgba(36, 36, 62, 0.7);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+        th,
+        td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
         }
 
         th {
-            background-color: #585858a8;
-            text-align: left;
+            background-color: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        th:hover {
+            background-color: rgba(0, 212, 255, 0.2);
+        }
+
+        td {
+            color: #eaeaea;
         }
 
         .win {
-            color: green;
+            color: #4CAF50;
             font-weight: bold;
         }
 
         .loss {
-            color: red;
+            color: #FF4444;
             font-weight: bold;
         }
 
+        button {
+            background-color: #00d4ff;
+            color: #0f0f1a;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #00a8cc;
+        }
+
+        /* Modal Styles (unchanged) */
         .modal {
             display: none;
             position: fixed;
@@ -45,73 +137,184 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             overflow: auto;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .modal-content {
-            background-color: #fff;
+            background: linear-gradient(145deg, rgba(45, 45, 45, 0.9), rgba(30, 30, 30, 0.9));
             margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            width: 50%;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 70%;
+            max-width: 800px;
             max-height: 90%;
-            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             overflow-y: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 8px;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
         }
 
-        .modal-content table {
-            width: 100%;
-            border-collapse: collapse;
+        .modal-content h2 {
+            font-size: 24px;
             margin-bottom: 20px;
+            color: #fff;
+            text-align: center;
         }
 
-        .modal-content th,
-        .modal-content td {
-            border: 1px solid #000;
-            padding: 8px;
-            text-align: left;
-            word-wrap: break-word;
+        .modal-content h3 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #fff;
         }
 
-        .modal-content th {
-            background-color: #f2f2f2;
+        .modal-content h4 {
+            font-size: 18px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #fff;
         }
 
-        .close {
-            color: #aaa;
+        .modal-content .close {
+            color: #fff;
             float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
         }
 
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
+        .modal-content .close:hover {
+            color: #ccc;
+        }
+
+        /* Card Layout for Factions and Rewards (unchanged) */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: #fff;
+        }
+
+        .card p {
+            margin: 5px 0;
+            color: #ddd;
+        }
+
+        .card .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .card .row span {
+            flex: 1;
+            text-align: left;
+        }
+
+        .card .row span:first-child {
+            font-weight: bold;
+        }
+
+        /* Two-Column Layout for Rewards (unchanged) */
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .reward-column {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .reward-column.winner {
+            border: 2px solid #4CAF50;
+        }
+
+        .reward-column.loser {
+            border: 2px solid #FF4444;
+        }
+
+        .reward-column h4 {
+            margin-top: 0;
+            color: #fff;
+        }
+
+        .reward-column p {
+            margin: 5px 0;
+            color: #ddd;
+        }
+
+        /* Contributors Table (unchanged) */
+        .contributors-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .contributors-table th,
+        .contributors-table td {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            text-align: left;
+        }
+
+        .contributors-table th {
+            background-color: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .contributors-table th:hover {
+            background-color: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
+
 <body>
+    <nav>
+        <ul>
+            <li><a href="/dashboard">Home</a></li>
+            <li><a href="/faction">Faction</a></li>
+            <li><a href="/past-wars">Past Wars</a></li>
+            <li><a href="/battle-stats">Battle Stats</a></li>
+            <li><a href="/track-enemy">Tracking</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
     <div class="container">
         <h1>Past Ranked Wars</h1>
-        <table>
+        <table id="past-wars-table">
             <thead>
                 <tr>
-                    <th>War ID</th>
-                    <th>Opponent</th>
-                    <th>Our Score</th>
-                    <th>Their Score</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Result</th>
+                    <th data-sort-type="numeric">War ID</th>
+                    <th data-sort-type="text">Opponent</th>
+                    <th data-sort-type="numeric">Our Score</th>
+                    <th data-sort-type="numeric">Their Score</th>
+                    <th data-sort-type="date">Start Date</th>
+                    <th data-sort-type="date">End Date</th>
+                    <th data-sort-type="text">Result</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -121,26 +324,26 @@
                     <td>{{ war_id }}</td>
                     <td>
                         {% for faction_id, faction_data in war_data.factions.items() %}
-                            {% if faction_id != '41067' %}
-                                {{ faction_data.name }}
-                            {% endif %}
+                        {% if faction_id != '41067' %}
+                        {{ faction_data.name }}
+                        {% endif %}
                         {% endfor %}
                     </td>
                     <td>{{ war_data.factions['41067'].score }}</td>
                     <td>
                         {% for faction_id, faction_data in war_data.factions.items() %}
-                            {% if faction_id != '41067' %}
-                                {{ faction_data.score }}
-                            {% endif %}
+                        {% if faction_id != '41067' %}
+                        {{ faction_data.score }}
+                        {% endif %}
                         {% endfor %}
                     </td>
                     <td>{{ war_data.war.start|datetime }}</td>
                     <td>{{ war_data.war.end|datetime }}</td>
                     <td class="{% if war_data.war.winner == 41067 %}win{% else %}loss{% endif %}">
                         {% if war_data.war.winner == 41067 %}
-                            Win
+                        Win
                         {% else %}
-                            Loss
+                        Loss
                         {% endif %}
                     </td>
                     <td>
@@ -152,7 +355,7 @@
         </table>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal (unchanged) -->
     <div id="view-report-modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeViewReportModal()">&times;</span>
@@ -163,6 +366,7 @@
     </div>
 
     <script>
+        // JavaScript for modal, sorting, and dynamic content
         function closeViewReportModal() {
             document.getElementById("view-report-modal").style.display = "none";
         }
@@ -170,6 +374,70 @@
         function openViewReportModal() {
             document.getElementById("view-report-modal").style.display = "block";
         }
+
+        // Sorting logic for tables
+        function sortTable(table, columnIndex, sortType) {
+            const tbody = table.querySelector("tbody");
+            if (!tbody) return; // Ensure tbody exists
+
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+            const isAscending = table.getAttribute(`data-sort-${columnIndex}`) !== "asc";
+
+            rows.sort((a, b) => {
+                const aValue = a.cells[columnIndex].textContent.trim();
+                const bValue = b.cells[columnIndex].textContent.trim();
+
+                if (sortType === "numeric") {
+                    return isAscending ? bValue - aValue : aValue - bValue;
+                } else if (sortType === "date") {
+                    const aDate = new Date(aValue);
+                    const bDate = new Date(bValue);
+                    return isAscending ? bDate - aDate : aDate - bDate;
+                } else {
+                    return isAscending ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
+                }
+            });
+
+            table.setAttribute(`data-sort-${columnIndex}`, isAscending ? "asc" : "desc");
+            tbody.innerHTML = ""; // Clear existing rows
+            rows.forEach(row => tbody.appendChild(row)); // Append sorted rows
+
+            // Update sorting icons
+            updateSortIcons(table, columnIndex);
+        }
+
+        // Update sorting icons in table headers
+        function updateSortIcons(table, sortedColumnIndex) {
+            const headers = table.querySelectorAll("th");
+            headers.forEach((header, index) => {
+                const icon = header.querySelector(".sort-icon");
+                if (icon) icon.remove(); // Remove existing icon
+
+                if (index === sortedColumnIndex) {
+                    const sortDirection = table.getAttribute(`data-sort-${index}`);
+                    const sortIcon = document.createElement("span");
+                    sortIcon.className = "sort-icon";
+                    sortIcon.textContent = sortDirection === "asc" ? " ▲" : " ▼";
+                    header.appendChild(sortIcon);
+                }
+            });
+        }
+
+        // Event delegation for table headers
+        document.addEventListener("click", (event) => {
+            if (event.target.tagName === "TH") {
+                const th = event.target;
+                const table = th.closest("table");
+                if (!table) return;
+
+                const columnIndex = Array.from(th.parentElement.children).indexOf(th);
+                const sortType = th.getAttribute("data-sort-type");
+
+                if (sortType) {
+                    sortTable(table, columnIndex, sortType);
+                }
+            }
+        });
 
         async function fetchWarReport(warId) {
             const modalContent = document.getElementById("view-report-content");
@@ -192,86 +460,121 @@
                 const factionBId = Object.keys(factions).find(id => id !== "41067");
                 const factionB = factions[factionBId];
 
+                const isFactionAWinner = war.winner === "41067";
+
                 modalContent.innerHTML = `
                     <h2>War Report for ID: ${warId}</h2>
-                    <h3>War Details</h3>
-                    <table>
-                        <tr><td><strong>Start Time:</strong></td><td>${new Date(war.start * 1000).toLocaleString()}</td></tr>
-                        <tr><td><strong>End Time:</strong></td><td>${new Date(war.end * 1000).toLocaleString()}</td></tr>
-                        <tr><td><strong>Winner:</strong></td><td>${war.winner === "41067" ? factionA.name : factionB.name}</td></tr>
-                        <tr><td><strong>Forfeit:</strong></td><td>${war.forfeit === 1 ? "Yes" : "No"}</td></tr>
-                    </table>
+                    <div class="card">
+                        <h3>War Details</h3>
+                        <div class="row">
+                            <span>Start Time:</span>
+                            <span>${new Date(war.start * 1000).toLocaleString()}</span>
+                        </div>
+                        <div class="row">
+                            <span>End Time:</span>
+                            <span>${new Date(war.end * 1000).toLocaleString()}</span>
+                        </div>
+                        <div class="row">
+                            <span>Winner:</span>
+                            <span class="${isFactionAWinner ? 'win' : 'loss'}">${isFactionAWinner ? factionA.name : factionB.name}</span>
+                        </div>
+                        <div class="row">
+                            <span>Forfeit:</span>
+                            <span>${war.forfeit === 1 ? "Yes" : "No"}</span>
+                        </div>
+                    </div>
 
-                    <h3>Factions</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Faction</th><th>Score</th><th>Attacks</th><th>Rank Before</th><th>Rank After</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>${factionA.name}</td><td>${factionA.score}</td><td>${factionA.attacks}</td><td>${factionA.rank_before}</td><td>${factionA.rank_after}</td></tr>
-                            <tr><td>${factionB.name}</td><td>${factionB.score}</td><td>${factionB.attacks}</td><td>${factionB.rank_before}</td><td>${factionB.rank_after}</td></tr>
-                        </tbody>
-                    </table>
+                    <div class="card">
+                        <h3>Factions</h3>
+                        <div class="row">
+                            <span>Faction</span>
+                            <span>Score</span>
+                            <span>Attacks</span>
+                            <span>Rank Before</span>
+                            <span>Rank After</span>
+                        </div>
+                        <div class="row">
+                            <span>${factionA.name}</span>
+                            <span>${factionA.score}</span>
+                            <span>${factionA.attacks}</span>
+                            <span>${factionA.rank_before}</span>
+                            <span>${factionA.rank_after}</span>
+                        </div>
+                        <div class="row">
+                            <span>${factionB.name}</span>
+                            <span>${factionB.score}</span>
+                            <span>${factionB.attacks}</span>
+                            <span>${factionB.rank_before}</span>
+                            <span>${factionB.rank_after}</span>
+                        </div>
+                    </div>
 
-                    <h3>Rewards</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Faction</th><th>Respect</th><th>Points</th><th>Items</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>${factionA.name}</td>
-                                <td>${factionA.rewards.respect}</td>
-                                <td>${factionA.rewards.points}</td>
-                                <td>${factionA.rewards.items ? Object.values(factionA.rewards.items).map(item => `${item.name} x${item.quantity}`).join(", ") : "None"}</td>
-                            </tr>
-                            <tr>
-                                <td>${factionB.name}</td>
-                                <td>${factionB.rewards.respect}</td>
-                                <td>${factionB.rewards.points}</td>
-                                <td>${factionB.rewards.items ? Object.values(factionB.rewards.items).map(item => `${item.name} x${item.quantity}`).join(", ") : "None"}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="card">
+                        <h3>Rewards</h3>
+                        <div class="rewards-grid">
+                            <div class="reward-column ${isFactionAWinner ? 'winner' : 'loser'}">
+                                <h4>${factionA.name}</h4>
+                                <p><strong>Respect:</strong> ${factionA.rewards.respect}</p>
+                                <p><strong>Points:</strong> ${factionA.rewards.points}</p>
+                                <p><strong>Items:</strong> ${factionA.rewards.items ? Object.values(factionA.rewards.items).map(item => `${item.name} x${item.quantity}`).join(", ") : "None"}</p>
+                            </div>
+                            <div class="reward-column ${isFactionAWinner ? 'loser' : 'winner'}">
+                                <h4>${factionB.name}</h4>
+                                <p><strong>Respect:</strong> ${factionB.rewards.respect}</p>
+                                <p><strong>Points:</strong> ${factionB.rewards.points}</p>
+                                <p><strong>Items:</strong> ${factionB.rewards.items ? Object.values(factionB.rewards.items).map(item => `${item.name} x${item.quantity}`).join(", ") : "None"}</p>
+                            </div>
+                        </div>
+                    </div>
 
-                    <h3>Top Contributors</h3>
-                    <h4>${factionA.name}</h4>
-                    <table>
-                        <thead>
-                            <tr><th>Name</th><th>Level</th><th>Score</th><th>Attacks</th></tr>
-                        </thead>
-                        <tbody>
-                            ${Object.values(factionA.members)
-                                .sort((a, b) => b.score - a.score)
-                                .map(member => `
-                                    <tr>
-                                        <td>${member.name}</td>
-                                        <td>${member.level}</td>
-                                        <td>${member.score}</td>
-                                        <td>${member.attacks}</td>
-                                    </tr>
-                                `).join("")}
-                        </tbody>
-                    </table>
+                    <div class="card">
+                        <h3>Top Contributors</h3>
+                        <h4>${factionA.name}</h4>
+                        <table class="contributors-table" data-sort-direction="asc">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th data-sort-type="numeric">Level</th>
+                                    <th data-sort-type="numeric">Score</th>
+                                    <th data-sort-type="numeric">Attacks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${Object.values(factionA.members)
+                        .map(member => `
+                                        <tr>
+                                            <td>${member.name}</td>
+                                            <td>${member.level}</td>
+                                            <td>${member.score}</td>
+                                            <td>${member.attacks}</td>
+                                        </tr>
+                                    `).join("")}
+                            </tbody>
+                        </table>
 
-                    <h4>${factionB.name}</h4>
-                    <table>
-                        <thead>
-                            <tr><th>Name</th><th>Level</th><th>Score</th><th>Attacks</th></tr>
-                        </thead>
-                        <tbody>
-                            ${Object.values(factionB.members)
-                                .sort((a, b) => b.score - a.score)
-                                .map(member => `
-                                    <tr>
-                                        <td>${member.name}</td>
-                                        <td>${member.level}</td>
-                                        <td>${member.score}</td>
-                                        <td>${member.attacks}</td>
-                                    </tr>
-                                `).join("")}
-                        </tbody>
-                    </table>
+                        <h4>${factionB.name}</h4>
+                        <table class="contributors-table" data-sort-direction="asc">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th data-sort-type="numeric">Level</th>
+                                    <th data-sort-type="numeric">Score</th>
+                                    <th data-sort-type="numeric">Attacks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${Object.values(factionB.members)
+                        .map(member => `
+                                        <tr>
+                                            <td>${member.name}</td>
+                                            <td>${member.level}</td>
+                                            <td>${member.score}</td>
+                                            <td>${member.attacks}</td>
+                                        </tr>
+                                    `).join("")}
+                            </tbody>
+                        </table>
+                    </div>
                 `;
             } catch (error) {
                 modalContent.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
@@ -280,7 +583,7 @@
             openViewReportModal();
         }
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById("view-report-modal");
             if (event.target === modal) {
                 closeViewReportModal();
@@ -288,4 +591,5 @@
         };
     </script>
 </body>
+
 </html>

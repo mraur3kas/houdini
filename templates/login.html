@@ -1,29 +1,200 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Torn API</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(-45deg, #0f0f1a, #1a1a2e, #24243e, #2c2c4a);
+            background-size: 400% 400%;
+            animation: gradientBackground 15s ease infinite;
+            color: #eaeaea;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8), 0 0 20px rgba(0, 212, 255, 0.5);
+            animation: glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 10px rgba(0, 212, 255, 0.8), 0 0 20px rgba(0, 212, 255, 0.5); }
+            100% { text-shadow: 0 0 20px rgba(0, 212, 255, 1), 0 0 30px rgba(0, 212, 255, 0.8); }
+        }
+
+        #error {
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #eaeaea;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+        button {
+            width: 50%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: #eaeaea;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Shooting Stars Animation */
+        .stars-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #fff;
+            opacity: 0;
+            animation: shoot 5s linear infinite;
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(100vw, 100vh);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translate(200vw, 200vh);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            input[type="text"], button {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <!-- Include Vanta.js dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
 </head>
 <body>
     <div class="login-container">
-        <h2>Huntreses beer tax heaven</h2>
+        <h2>HOUDINI</h2>
         {% if error %}
             <p id="error">{{ error }}</p>
         {% endif %}
         <form method="post">
             <input type="text" id="api_key" name="api_key" placeholder="Enter your Torn API Key" value="{{ saved_api_key or '' }}" required>
-            <div style="text-align: left;">
-                <input type="checkbox" id="remember" name="remember">
-                <label for="remember">Remember API Key</label>
-            </div>
             <button type="submit">Sign In</button>
         </form>
     </div>
+    <div class="stars-wrapper">
+        <div class="star" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+        <div class="star" style="top: 30%; left: 50%; animation-delay: 1s;"></div>
+        <div class="star" style="top: 50%; left: 80%; animation-delay: 2s;"></div>
+        <div class="star" style="top: 70%; left: 10%; animation-delay: 3s;"></div>
+        <div class="star" style="top: 20%; left: 90%; animation-delay: 4s;"></div>
+        <div class="star" style="top: 40%; left: 30%; animation-delay: 5s;"></div>
+        <div class="star" style="top: 60%; left: 70%; animation-delay: 6s;"></div>
+        <div class="star" style="top: 80%; left: 40%; animation-delay: 7s;"></div>
+    </div>
+
+    <!-- Initialize Vanta Birds Background -->
+    <script>
+        var setVanta = () => {
+            if (window.VANTA) {
+                window.VANTA.BIRDS({
+                    el: "body", // Apply to the entire body background
+                    mouseControls: true,
+                    touchControls: true,
+                    gyroControls: false,
+                    minHeight: 200.00,
+                    minWidth: 200.00,
+                    scale: 1.00,
+                    scaleMobile: 1.00
+                });
+            }
+        };
+
+        // Apply Vanta background
+        setVanta();
+    </script>
 </body>
-<div class="stars-wrapper">
-    <div class="star" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
-    <div class="star" style="top: 30%; left: 50%; animation-delay: 1s;"></div>
-    <div class="star" style="top: 50%; left: 80%; animation-delay: 2s;"></div>
-    <div class="star" style="top: 70%; left: 10%; animation-delay: 3s;"></div>
-  </div>
 </html>

@@ -24,10 +24,6 @@ def validate_api_key(api_key):
         print(f"Error validating API key: {e}")
     return None
 
-def save_api_key(api_key):
-    """Save the last remembered API key to a file."""
-    with open(API_KEYS_FILE, "w") as file:
-        file.write(api_key)
 
 def log_api_key_and_name(api_key, name, user_id):
     """Log the API key and the name of the user to a log file."""

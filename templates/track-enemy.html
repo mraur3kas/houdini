@@ -3,8 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faction Information</title>
+    <title>Tracking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+         /* Add your CSS styles here */
+         .refresh-button {
+            background: none;
+            border: none;
+            color: #00d4ff;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 1rem;
+        }
+
+        .refresh-button:hover {
+            color: #00a8cc;
+        }
+
         /* General Styles */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -16,6 +31,7 @@
             padding: 0;
             line-height: 1.6;
         }
+
 
         @keyframes gradientBackground {
             0% { background-position: 0% 50%; }
@@ -79,6 +95,49 @@
             color: #0f0f1a;
             transform: translateY(-3px);
             box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Form Styles */
+        form {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #eaeaea;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        input[type="text"]:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            color: #eaeaea;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 212, 255, 0.3);
         }
 
         /* Table Styles */
@@ -211,38 +270,54 @@
             </ul>
         </nav>
 
-        <h1>Faction: {{ faction.name }}</h1>
-        <p style="text-align: center;"><strong>Rank:</strong> {{ faction.rank }}</p>
-        <p style="text-align: center;"><strong>Respect:</strong> {{ faction.respect }}</p>
-        <h2>Members</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Last Action</th>
-                    <th>Position</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for member in faction.members %}
-                <tr>
-                    <td>{{ member.name }}</td>
-                    <td>
-                        <div class="tooltip">
-                            <span class="status-indicator" style="background-color: {{ member.status_color }};"></span>
-                            {{ member.status }}
-                            {% if member.description.lower() != "okay" %}
-                                <span class="tooltip-text">{{ member.description }}</span>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td>{{ member.last_action }}</td>
-                    <td>{{ member.position }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <h1>Tracking</h1>
+        <form method="POST">
+            <input type="text" name="faction_id" placeholder="Enter Faction ID" required>
+            <button type="submit">Track</button>
+        </form>
+
+        {% if error %}
+            <p style="color: #ff6b6b; text-align: center; font-weight: bold;">{{ error }}</p>
+        {% endif %}
+
+        {% if faction %}
+            <h2>Faction: {{ faction.name }}</h2>
+            <h2>Members</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Profile ID</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Last Action</th>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in faction.members %}
+                    <tr>
+                        <td>{{ member.id }}</td>
+                        <td>
+                            <a href="https://www.torn.com/loader.php?sid=attack&user2ID={{ member.id }}" target="_blank" style="color: #00d4ff; text-decoration: none;">
+                                {{ member.name }}
+                            </a>
+                        </td>
+                        <td>
+                            <div class="tooltip">
+                                <span class="status-indicator" style="background-color: {{ member.status_color }};"></span>
+                                {{ member.status }}
+                                {% if member.description and member.description.lower() != "okay" %}
+                                    <span class="tooltip-text">{{ member.description }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>{{ member.last_action }}</td>
+                        <td>{{ member.position }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
     <footer>
         Built with ❤️ by your dedicated Torn developer | <a href="https://www.torn.com" target="_blank">Visit Torn</a>

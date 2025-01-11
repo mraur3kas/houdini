@@ -1,28 +1,264 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(-45deg, #0f0f1a, #1a1a2e, #24243e, #2c2c4a);
+            background-size: 400% 400%;
+            animation: gradientBackground 15s ease infinite;
+            color: #eaeaea;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-y: scroll; /* Allow scrolling on the page */
+        }
+
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #eaeaea;
+            margin-top: 10px;
+        }
+
+        /* Navigation Styles */
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        nav ul li {
+            display: inline;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #eaeaea;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            background-color: rgba(36, 36, 62, 0.7);
+        }
+
+        nav ul li a:hover {
+            background-color: #00d4ff;
+            color: #0f0f1a;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Quote Generator */
+        .quote {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #eaeaea;
+            margin-top: 20px;
+            animation: fadeIn 2s ease;
+        }
+
+        /* News Ticker */
+        .news-ticker {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            background: rgba(36, 36, 62, 0.7);
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .news-ticker span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 20s linear infinite;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Interactive Polls */
+        .poll {
+            margin-top: 30px;
+            background: rgba(36, 36, 62, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .poll h2 {
+            font-size: 1.8rem;
+            color: #00d4ff;
+            margin-bottom: 15px;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .poll button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1.1rem;
+            color: #eaeaea;
+            background: #24243e;
+            border: 1px solid #00d4ff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .poll button:hover {
+            background: #00d4ff;
+            color: #0f0f1a;
+            transform: scale(1.1);
+        }
+
+        /* Faction Goals */
+        .faction-goals {
+            margin-top: 30px;
+            background: rgba(36, 36, 62, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 2s ease;
+        }
+
+        .faction-goals h2 {
+            font-size: 1.8rem;
+            color: #00d4ff;
+            margin-bottom: 15px;
+        }
+
+        .faction-goals ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .faction-goals li {
+            font-size: 1.2rem;
+            color: #eaeaea;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(36, 36, 62, 0.9);
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .faction-goals li:hover {
+            transform: scale(1.05);
+            background: #1a1a2e;
+        }
+
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="stars-wrapper">
+    <div class="stars-wrapper">
         <div class="star" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
         <div class="star" style="top: 30%; left: 50%; animation-delay: 1s;"></div>
         <div class="star" style="top: 50%; left: 80%; animation-delay: 2s;"></div>
         <div class="star" style="top: 70%; left: 10%; animation-delay: 3s;"></div>
-      </div>
-        <h1>Welcome, {{ name }}!</h1>
+        <div class="star" style="top: 20%; left: 90%; animation-delay: 4s;"></div>
+        <div class="star" style="top: 40%; left: 30%; animation-delay: 5s;"></div>
+        <div class="star" style="top: 60%; left: 70%; animation-delay: 6s;"></div>
+        <div class="star" style="top: 80%; left: 40%; animation-delay: 7s;"></div>
+    </div>
+    <div class="container">
+        <div class="news-ticker">
+            <span>TRAINING MONTH: January</span>
+        </div>
         <nav>
             <ul>
-                <li><a href="/dashboard">Home</a></li>
                 <li><a href="/faction">Faction</a></li>
                 <li><a href="/past-wars">Past Wars</a></li>
+                <li><a href="/faction-battle-stats">Faction Battle Stats</a></li>
                 <li><a href="/battle-stats">Battle Stats</a></li>
+                <li><a href="/track-enemy">Tracking</a></li>
                 <li><a href="/logout">Logout</a></li>
             </ul>
         </nav>
-        <p>You have successfully logged in.</p>
-    </div>
+        <h1 id="greeting">Welcome, {{ name }}!</h1>
+        <div class="quote" id="quote"></div>
+        
+        <!-- Interactive Polls -->
+        <div class="poll">
+            <h2>FACTION POLL</h2>
+            <button onclick="alert('SOON!')">SOON!</button>
+            <button onclick="alert('SOON!')">SOON!</button>
+            <button onclick="alert('SOON!')">SOON!</button>
+        </div>
+
+        <!-- Faction Goals -->
+        <div class="faction-goals">
+            <h2>Faction Goals</h2>
+            <ul>
+                <li>Reach 2 mil respect by the end of 2025</li>
+                <li>Maintain Platinum rank</li>
+            </ul>
+        </div>
+
+    <script>
+        // Greeting Based on Time of Day
+        function updateGreeting() {
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting = 'Welcome';
+            if (hour < 12) greeting = 'Good Morning';
+            else if (hour < 18) greeting = 'Good Afternoon';
+            else greeting = 'Good Evening';
+            document.getElementById('greeting').textContent = `${greeting}, {{ name }}!`;
+        }
+        updateGreeting();
+
+        // Random Quote Generator
+        const quotes = [
+            "The only limit to our realization of tomorrow is our doubts of today.",
+            "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+            "Believe you can and you're halfway there.",
+            "Do what you can, with what you have, where you are.",
+            "It always seems impossible until it's done."
+        ];
+        function updateQuote() {
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quote').textContent = `"${randomQuote}"`;
+        }
+        updateQuote();
+        setInterval(updateQuote, 10000); // Change quote every 10 seconds
+    </script>
 </body>
 </html>

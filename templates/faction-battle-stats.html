@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faction Battle Stats</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(-45deg, #0f0f1a, #1a1a2e, #24243e, #2c2c4a);
+            background-size: 400% 400%;
+            animation: gradientBackground 15s ease infinite;
+            color: #eaeaea;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px 30px;
+            width: 90%;
+            max-width: 1200px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            color: #00d4ff;
+        }
+
+        /* Navigation Menu */
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        nav ul li {
+            display: inline;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #eaeaea;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            background-color: rgba(36, 36, 62, 0.7);
+        }
+
+        nav ul li a:hover {
+            background-color: #00d4ff;
+            color: #0f0f1a;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            color: #00d4ff;
+            cursor: pointer;
+        }
+
+        td {
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        a, .button {
+            text-decoration: none;
+            color: #ffdd57;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+        }
+
+        a:hover, .button:hover {
+            color: #ffbb33;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00d4ff;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00a8cc;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            nav ul li a {
+                font-size: 1rem;
+                padding: 8px 16px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            a, .button {
+                font-size: 0.9rem;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+    <script>
+        // Sort table functionality
+        function sortTable(columnIndex) {
+            const table = document.querySelector("table tbody");
+            const rows = Array.from(table.rows);
+
+            // Determine sort direction
+            const isAscending = table.getAttribute("data-sort") === "asc";
+            table.setAttribute("data-sort", isAscending ? "desc" : "asc");
+
+            rows.sort((rowA, rowB) => {
+                const cellA = rowA.cells[columnIndex].innerText.replace(/,/g, '');
+                const cellB = rowB.cells[columnIndex].innerText.replace(/,/g, '');
+
+                const valueA = isNaN(cellA) ? cellA : parseFloat(cellA);
+                const valueB = isNaN(cellB) ? cellB : parseFloat(cellB);
+
+                return isAscending ? valueA > valueB ? 1 : -1 : valueA < valueB ? 1 : -1;
+            });
+
+            // Reattach sorted rows
+            rows.forEach(row => table.appendChild(row));
+        }
+
+        // Attach event listeners
+        document.addEventListener("DOMContentLoaded", () => {
+            const headers = document.querySelectorAll("th");
+            headers.forEach((header, index) => {
+                header.addEventListener("click", () => sortTable(index));
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Dashboard Navigation Menu -->
+        <nav>
+            <ul>
+                <li><a href="/dashboard">Home</a></li>
+                <li><a href="/faction">Faction</a></li>
+                <li><a href="/past-wars">Past Wars</a></li>
+                <li><a href="/faction-battle-stats">Faction Battle Stats</a></li>
+                <li><a href="/battle-stats">Battle Stats</a></li>
+                <li><a href="/track-enemy">Tracking</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+
+        <h1>Faction Battle Stats</h1>
+        <table data-sort="asc">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Strength</th>
+                    <th>Defense</th>
+                    <th>Speed</th>
+                    <th>Dexterity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in faction_stats %}
+                <tr>
+                    <td>{{ member[0] }}</td>
+                    <td>{{ "{:,}".format(member[1] | to_int) }}</td>
+                    <td>{{ "{:,}".format(member[2] | to_int) }}</td>
+                    <td>{{ "{:,}".format(member[3] | to_int) }}</td>
+                    <td>{{ "{:,}".format(member[4] | to_int) }}</td>
+                    <td>{{ "{:,}".format(member[5] | to_int) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
